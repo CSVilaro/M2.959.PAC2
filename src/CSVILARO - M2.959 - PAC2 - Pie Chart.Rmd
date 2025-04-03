@@ -1,0 +1,184 @@
+---
+title: "M2.959 - PAC2 - Pie Chart"
+author: "Autor: Carles Sanchez Vilaro"
+date: "Abril 2025"
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+    includes:
+      in_header: M2.959-PAC-header.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Context
+
+Crearem un Pie Chart basat en els accidents de trànsit mortals als EUA durant el 2022 (últim any disponible segons la font), comparant si aquests van tenir lloc a autopistes o en altres vies. El conjunt de dades és de domini públic i ha estat compilat per la National Highway Traffic Safety Administration.
+
+Font:
+https://static.nhtsa.gov/nhtsa/downloads/FARS/2022/National/FARS2022NationalCSV.zip
+
+
+# Carrega de dades i llibreries
+
+Carreguem les llibreries necessàries i el conjunt de dades.
+
+```{r message= FALSE, warning=FALSE}
+llibreries <- c("knitr",
+                "dplyr",
+                "ggplot2")
+
+llibreries_a_instalar <- llibreries[!(llibreries %in% installed.packages()[,"Package"])]
+if(length(llibreries_a_instalar)) install.packages(llibreries_a_instalar)
+
+llibreries_carregades <- lapply(llibreries, library, character.only = TRUE) 
+
+accidents <- read.csv("accident.csv")
+glimpse(accidents)
+```
+
+Descrivim les variables:
+
+**DIMENSIÓ GEOGRÀFICA**
+
++ **STATE** codificació d'estat
++ **STATENAME** nom d'estat
++ **COUNTY** identificador de contat
++ **COUNTYNAME** comtat
++ **CITY** identificador de ciutat
++ **CITYNAME** ciutat
++ **ROUTE**  identificador de ruta
++ **ROUTENAME** ruta
++ **TWAY_ID** via de transit (1982) 
++ **TWAY_ID2** via de transit (2004)
++ **RUR_URB** identificador de segment rural o urbà
++ **RUR_URBNAME** segment rural o urbà
++ **FUNC_SYS** classificació funcional segment
++ **FUNC_SYSNAME** TBD
++ **RD_OWNER** identificador propietari del segment     
++ **RD_OWNERNAME** propietari del segment 
++ **MILEPT** milla int
++ **MILEPTNAME** milla chr
++ **LATITUDE** latitud int    
++ **LATITUDENAME** latitud chr
++ **LONGITUD** longitud int
++ **LONGITUDNAME** longitud chr
++ **SP_JUR** codi jurisdicció
++ **SP_JURNAME** jurisdicció
+
+**DIMENSIÓ TEMPORAL**
+
++ **MONTH** mes    
++ **MONTHNAME** nom de mes
++ **YEAR** any
++ **DAY** dia         
++ **DAYNAME** dia repetit
++ **DAY_WEEK** dia de la setmana    
++ **DAY_WEEKNAME** nom de dia de la setmana
++ **HOUR** hora
++ **HOURNAME** franja hora
++ **MINUTE** minut int
++ **MINUTENAME** minut chr
+
+**DIMENSIÓ CONDICIONS ACCIDENT**
+
++ **ST_CASE**  identificador d'accident
++ **HARM_EV** codi primer esdeveniment de l'accident que produeixi danys o lesions
++ **HARM_EVNAME** primer esdeveniment de l'accident que produeixi danys o lesions
++ **MAN_COLL** codi de posició dels vehicles 
++ **MAN_COLLNAME** posició dels vehicles
++ **RELJCT1** codi si hi ha àrea d'intercanvi
++ **RELJCT1NAME**  si hi ha àrea d'intercanvi
++ **RELJCT2** codi proximitat encreuament
++ **RELJCT2NAME** proximitat encreuament
++ **TYP_INT** codi tipus d'intersecció
++ **TYP_INTNAME** tipus d'intersecció
++ **WRK_ZONE** codi tipologia d'obres     
++ **WRK_ZONENAME** tipologia d'obres
++ **REL_ROAD**     codi ubicació vehicle a la via
++ **REL_ROADNAME** ubicació vehicle a la via
++ **LGT_COND**     codi condició lumínica
++ **LGT_CONDNAME** condició lumínica
++ **DRUNK_DR** conductors beguts
++ **VE_TOTAL** nombre de vehicles implicats en total 
++ **VE_FORMS** nombre de vehicles en moviment implicats
++ **PVH_INVL** nombre de vehicles estacionats implicats
++ **PEDS**     nombre de vianants implicats
++ **PERSONS**  nombre ocupants de vehicle implicats
++ **PERMVIT**  nombre conductors i ocupants implicats
++ **PERNOTMVIT** nombre vianants, ciclistes, a cavall... qualsevol cosa menys vehicle motoritzat
++ **WEATHER**     codi temps
++ **WEATHERNAME** descriptor temps
++ **FATALS** morts 
++ **NHS** 1 ha passat a autopista del NHS 0 no
++ **NHSNAME** descriptor  NHS
+
+**ALTRES**
+
++ **SCH_BUS** codi si vehicle escolar implicat
++ **SCH_BUSNAME** vehicle escolar implicat
++ **RAIL** codi si dins o a prop pas ferroviari
++ **RAILNAME**  si dins o a prop pas ferroviari
+
+**DIMENSIÓ SERVEI EMERGENCIES**
+
++ **NOT_HOUR** hora notificació a emergències int
++ **NOT_HOURNAME** hora notificació a emergències franja 
++ **NOT_MIN** minut notificació a emergències int
++ **NOT_MINNAME** minut notificació a emergències chr
++ **ARR_HOUR** hora arribada emergències int
++ **ARR_HOURNAME** hora arribada emergències franja
++ **ARR_MIN** minut arribada emergències int
++ **ARR_MINNAME** minut arribada emergències franja 
++ **HOSP_HR** hora arribada hospital int
++ **HOSP_HRNAME** hora arribada hospital franja
++ **HOSP_MN** minut arribada hospital int
++ **HOSP_MNNAME** : minut arribada hospital franja
+
+# Pie Chart
+
+Estudiem la relació entre la proporció del nombre d'accidents mortals a autopistes al llarg dels anys.
+
+```{r}
+accidents <- accidents %>%
+  mutate(NHS = case_when(
+    NHS == 0 ~ "Not Highway",
+    NHS == 1 ~ "Highway",
+    is.na(NHS) | NHS == 9 ~ "Unknown"
+  )) %>%
+  group_by(NHS) %>%
+  summarise(Total_Accidents = n(), .groups = "drop") %>%
+  mutate(Percentatge = Total_Accidents / sum(Total_Accidents) * 100)
+
+accidents <- accidents %>%
+  arrange(Total_Accidents) %>%
+  mutate(
+    NHS = factor(NHS, levels = NHS))
+
+ggplot(accidents, aes(x = "", y = Total_Accidents, fill = NHS)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  theme_void() +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "none") +
+  ggtitle("Proportion of Accidents per Type of Road") +
+  scale_fill_manual(values = c("Not Highway" = "wheat3",
+                               "Highway" = "indianred",
+                               "Unknown" = "azure2")) +
+  geom_text(aes(
+    label = ifelse(Percentatge < 1, "", paste0(NHS, "\n", format(Total_Accidents, big.mark = ","), " (", round(Percentatge, 1), "%)"))
+  ), position = position_stack(vjust = 0.5)) +
+  geom_text(data = filter(accidents, Percentatge < 1),
+            aes(
+              x = 1.7, y = cumsum(Total_Accidents) - Total_Accidents / 2,
+              label = paste0(NHS, "\n", format(Total_Accidents, big.mark = ","), " (", round(Percentatge, 1), "%)")))
+```
+
+# Conclusió
+
+Aquest pie chart mostra la proporció d'accidents segons el tipus de carretera. Una mica més de la meitat d'accidents (54,9%) es produeixen en carreteres que no són autopistes, mentre que un 44,8% tenen lloc en autopistes. Un petit percentatge (0,2%) es classifica com desconegut. Això suggereix que, malgrat les mesures de seguretat a les autopistes, el nombre d'accidents en vies convencionals segueix sent més elevat, possiblement a causa de factors com la presència d'interseccions, vianants i condicions variables del trànsit.
