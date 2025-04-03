@@ -8,8 +8,9 @@ Aquest repositori conté els arxius de codi R i els conjunts de dades necessaris
 - **README.Rmd**: Fitxer explicatiu sobre el contingut del repositori.
 
 ## Visualitzacions tractades
-Aquest treball inclou les següents visualitzacions:
-- **Alluvial Diagram**
+Aquest treball inclou les següents visualitzacions, i aquests són els seus resultats finals:
+- **Alluvial Diagram**:
+  (output/csvilaro_alluvial_diagram.png)
 - **Pie Chart**
 - **Rain Cloud Plot**
 
