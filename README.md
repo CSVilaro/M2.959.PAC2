@@ -13,7 +13,7 @@ Aquest treball inclou les següents visualitzacions, i aquests són els seus res
 ![Resultats Finals](output/csvilaro_alluvial_diagram.png){width=400px}
 
 - **Pie Chart**
-![Resultats Finals](output/csvilaro_pie_chart.png){width=400px}
+![Resultats Finals](output/csvilaro_pie_chart.png){width=100px}
 
 - **Rain Cloud Plot**
 ![Resultats Finals](output/csvilaro_raincloud_plot.png){width=400px}
