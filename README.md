@@ -10,7 +10,7 @@ Aquest repositori conté els arxius de codi R i els conjunts de dades necessaris
 ## Visualitzacions tractades
 Aquest treball inclou les següents visualitzacions, i aquests són els seus resultats finals:
 - **Alluvial Diagram**:
-  (output/csvilaro_alluvial_diagram.png)
+![Resultats Finals](output/csvilaro_alluvial_diagram.png)
 - **Pie Chart**
 - **Rain Cloud Plot**
 
