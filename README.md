@@ -10,13 +10,13 @@ Aquest repositori conté els arxius de codi R i els conjunts de dades necessaris
 ## Visualitzacions tractades
 Aquest treball inclou les següents visualitzacions, i aquests són els seus resultats finals:
 - **Alluvial Diagram**:
-![Resultats Finals](output/csvilaro_alluvial_diagram.png){width=400px}
+<img src="output/csvilaro_alluvial_diagram.png" alt="Alluvial Diagram" width="400">
 
 - **Pie Chart**
-![Resultats Finals](output/csvilaro_pie_chart.png){width=100px}
+<img src="output/csvilaro_pie_chart.png" alt="Pie Chart" width="400">
 
 - **Rain Cloud Plot**
-![Resultats Finals](output/csvilaro_raincloud_plot.png){width=400px}
+<img src="output/csvilaro_raincloud_plot.png" alt="Rain Cloud Plot" width="400">
 
 ## Requisits
 - Programari: R (versió 2024.12.0) i les llibreries necessàries (`dplyr`, `ggplot2`, `ggalluvial`, `ggrain`, entre altres).
